@@ -12,15 +12,25 @@ func main() {
 	tv := device.NewTV()
 	radio := device.NewRadio()
 
-	basicRemote := remote.NewBasicRemote(tv)
-	advancedRemote := remote.NewAdvancedRemote(radio)
+	// Initialize remotes with their respective devices
+	basicRemoteTV := remote.NewBasicRemote(tv)
+	advancedRemoteRadio := remote.NewAdvancedRemote(radio)
 
-	fmt.Println("Testing Basic Remote with TV")
-	basicRemote.On()
-	basicRemote.Off()
+	// Demonstrate basic remote functions with TV
+	fmt.Println("\nTesting Basic Remote with TV")
+	basicRemoteTV.On()
+	basicRemoteTV.VolumeUp()
+	basicRemoteTV.VolumeDown()
+	basicRemoteTV.Off()
 
-	fmt.Println("Testing Advanced Remote with Radio")
-	advancedRemote.On()
-	advancedRemote.Mute()
-	advancedRemote.Off()
+	// Demonstrate advanced remote functions with Radio
+	fmt.Println("\nTesting Advanced Remote with Radio")
+	advancedRemoteRadio.On()
+	advancedRemoteRadio.VolumeUp()
+	advancedRemoteRadio.Mute() // Ensure this function is available in your AdvancedRemote type
+	advancedRemoteRadio.Off()
+
+	// Checking the power status using the advanced remote
+	status := advancedRemoteRadio.CheckPowerStatus()
+	fmt.Println("Radio power status:", status)
 }

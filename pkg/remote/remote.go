@@ -5,12 +5,13 @@ import (
 	"fmt"
 )
 
-// Remote interface
+// Remote interface now includes volume control and power status check
 type Remote interface {
 	On()
 	Off()
 	VolumeUp()
 	VolumeDown()
+	CheckPowerStatus() string
 }
 
 // BasicRemote struct implementing the Remote interface
@@ -32,26 +33,30 @@ func (r *BasicRemote) Off() {
 	fmt.Println("Basic remote: device turned off")
 }
 
-// AdvancedRemote struct with additional functionality
+func (r *BasicRemote) VolumeUp() {
+	r.device.VolumeUp()
+	fmt.Println("Basic remote: volume up")
+}
+
+func (r *BasicRemote) VolumeDown() {
+	r.device.VolumeDown()
+	fmt.Println("Basic remote: volume down")
+}
+
+func (r *BasicRemote) CheckPowerStatus() string {
+	return r.device.PowerStatus()
+}
+
+// AdvancedRemote includes additional functionality
 type AdvancedRemote struct {
-	device device.Device
+	*BasicRemote
 }
 
 func NewAdvancedRemote(device device.Device) Remote {
-	return &AdvancedRemote{device: device}
-}
-
-func (r *AdvancedRemote) On() {
-	r.device.TurnOn()
-	fmt.Println("Advanced remote: device turned on")
-}
-
-func (r *AdvancedRemote) Off() {
-	r.device.TurnOff()
-	fmt.Println("Advanced remote: device turned off")
+	return &AdvancedRemote{BasicRemote: NewBasicRemote(device).(*BasicRemote)}
 }
 
 func (r *AdvancedRemote) Mute() {
+	r.device.SetVolume(0)
 	fmt.Println("Advanced remote: device muted")
-	// Assuming mute functionality is implemented in the device
 }

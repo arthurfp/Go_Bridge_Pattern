@@ -2,38 +2,63 @@ package device
 
 import "fmt"
 
-// Device interface
+// Device interface includes the methods that any device should implement
 type Device interface {
 	TurnOn()
 	TurnOff()
+	VolumeUp()
+	VolumeDown()
+	PowerStatus() string
+	SetVolume(level int)
 }
 
-// TV struct implementing Device
-type TV struct{}
+// TV struct implementing the Device interface
+type TV struct {
+	powerOn bool
+	volume  int
+}
 
+// NewTV creates a new TV object
 func NewTV() Device {
 	return &TV{}
 }
 
+// TurnOn turns the TV on
 func (tv *TV) TurnOn() {
-	fmt.Println("TV is on")
+	tv.powerOn = true
+	fmt.Println("TV is turned on")
 }
 
+// TurnOff turns the TV off
 func (tv *TV) TurnOff() {
-	fmt.Println("TV is off")
+	tv.powerOn = false
+	fmt.Println("TV is turned off")
 }
 
-// Radio struct implementing Device
-type Radio struct{}
-
-func NewRadio() Device {
-	return &Radio{}
+// VolumeUp increases the volume of the TV
+func (tv *TV) VolumeUp() {
+	tv.volume++
+	fmt.Println("TV volume increased to", tv.volume)
 }
 
-func (radio *Radio) TurnOn() {
-	fmt.Println("Radio is on")
+// VolumeDown decreases the volume of the TV
+func (tv *TV) VolumeDown() {
+	if tv.volume > 0 {
+		tv.volume--
+		fmt.Println("TV volume decreased to", tv.volume)
+	}
 }
 
-func (radio *Radio) TurnOff() {
-	fmt.Println("Radio is off")
+// PowerStatus returns the current power status of the TV
+func (tv *TV) PowerStatus() string {
+	if tv.powerOn {
+		return "on"
+	}
+	return "off"
+}
+
+// SetVolume sets the volume to a specific level
+func (tv *TV) SetVolume(level int) {
+	tv.volume = level
+	fmt.Println("TV volume set to", tv.volume)
 }
