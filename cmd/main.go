@@ -7,30 +7,27 @@ import (
 )
 
 func main() {
-	fmt.Println("Bridge Pattern in Go")
+	fmt.Println("Starting Bridge Pattern Demo")
 
+	// Initialize devices
 	tv := device.NewTV()
 	radio := device.NewRadio()
 
-	// Initialize remotes with their respective devices
+	// Initialize remotes for each device
 	basicRemoteTV := remote.NewBasicRemote(tv)
 	advancedRemoteRadio := remote.NewAdvancedRemote(radio)
 
-	// Demonstrate basic remote functions with TV
-	fmt.Println("\nTesting Basic Remote with TV")
+	// Test TV controls
+	fmt.Println("\nTesting TV with Basic Remote")
 	basicRemoteTV.On()
 	basicRemoteTV.VolumeUp()
 	basicRemoteTV.VolumeDown()
 	basicRemoteTV.Off()
 
-	// Demonstrate advanced remote functions with Radio
-	fmt.Println("\nTesting Advanced Remote with Radio")
+	// Test Radio controls
+	fmt.Println("\nTesting Radio with Advanced Remote")
 	advancedRemoteRadio.On()
 	advancedRemoteRadio.VolumeUp()
-	advancedRemoteRadio.Mute() // Ensure this function is available in your AdvancedRemote type
+	advancedRemoteRadio.ToggleStandby()
 	advancedRemoteRadio.Off()
-
-	// Checking the power status using the advanced remote
-	status := advancedRemoteRadio.CheckPowerStatus()
-	fmt.Println("Radio power status:", status)
 }
