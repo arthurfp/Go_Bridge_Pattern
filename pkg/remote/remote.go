@@ -54,6 +54,7 @@ func (r *BasicRemote) SetChannel(channel int) {
 
 type AdvancedRemote struct {
 	*BasicRemote
+	favoriteChannel int
 }
 
 func NewAdvancedRemote(device device.Device) *AdvancedRemote {
@@ -63,4 +64,14 @@ func NewAdvancedRemote(device device.Device) *AdvancedRemote {
 func (r *AdvancedRemote) Mute() {
 	r.device.SetVolume(0)
 	fmt.Println("Device muted")
+}
+
+func (r *AdvancedRemote) SetFavoriteChannel(channel int) {
+	r.favoriteChannel = channel
+	fmt.Println("Favorite channel set to", channel)
+}
+
+func (r *AdvancedRemote) GoToFavoriteChannel() {
+	r.device.SetChannel(r.favoriteChannel)
+	fmt.Println("Switched to favorite channel", r.favoriteChannel)
 }
