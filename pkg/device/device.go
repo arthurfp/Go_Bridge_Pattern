@@ -2,7 +2,6 @@ package device
 
 import "fmt"
 
-// Device interface defines common operations for all devices.
 type Device interface {
 	TurnOn()
 	TurnOff()
@@ -11,21 +10,20 @@ type Device interface {
 	PowerStatus() string
 	SetVolume(level int)
 	ToggleStandby()
+	SetChannel(channel int)
 }
 
-// TV struct represents a television with basic functionalities.
 type TV struct {
 	powerOn bool
 	volume  int
 	standby bool
+	channel int
 }
 
-// NewTV initializes a new TV instance.
 func NewTV() Device {
 	return &TV{}
 }
 
-// TurnOn powers on the TV unless it's in standby mode.
 func (tv *TV) TurnOn() {
 	if !tv.standby {
 		tv.powerOn = true
@@ -33,58 +31,62 @@ func (tv *TV) TurnOn() {
 	}
 }
 
-// TurnOff powers off the TV.
 func (tv *TV) TurnOff() {
 	tv.powerOn = false
 	fmt.Println("TV is now off")
 }
 
-// VolumeUp increases the volume by one unit.
 func (tv *TV) VolumeUp() {
-	tv.volume++
-	fmt.Println("Increased TV volume to", tv.volume)
-}
-
-// VolumeDown decreases the volume by one unit.
-func (tv *TV) VolumeDown() {
-	if tv.volume > 0 {
-		tv.volume--
-		fmt.Println("Decreased TV volume to", tv.volume)
+	if !tv.standby {
+		tv.volume++
+		fmt.Println("TV volume increased to", tv.volume)
 	}
 }
 
-// PowerStatus checks if the TV is on or off.
+func (tv *TV) VolumeDown() {
+	if !tv.standby && tv.volume > 0 {
+		tv.volume--
+		fmt.Println("TV volume decreased to", tv.volume)
+	}
+}
+
 func (tv *TV) PowerStatus() string {
 	if tv.powerOn {
-		return "The TV is on"
+		return "on"
 	}
-	return "The TV is off"
+	return "off"
 }
 
-// SetVolume sets the volume to a specific level.
 func (tv *TV) SetVolume(level int) {
-	tv.volume = level
-	fmt.Println("Set TV volume to", tv.volume)
+	if !tv.standby {
+		tv.volume = level
+		fmt.Println("TV volume set to", tv.volume)
+	}
 }
 
-// ToggleStandby toggles the TV's standby status.
 func (tv *TV) ToggleStandby() {
 	tv.standby = !tv.standby
-	state := "off"
 	if tv.standby {
-		state = "on"
+		fmt.Println("TV is in standby mode")
+	} else {
+		fmt.Println("TV is active")
 	}
-	fmt.Println("TV standby mode is", state)
 }
 
-// Radio struct represents a radio with basic functionalities.
+func (tv *TV) SetChannel(channel int) {
+	if !tv.standby {
+		tv.channel = channel
+		fmt.Println("TV channel set to", tv.channel)
+	}
+}
+
 type Radio struct {
 	powerOn bool
 	volume  int
 	standby bool
+	channel int
 }
 
-// NewRadio initializes a new Radio instance.
 func NewRadio() Device {
 	return &Radio{}
 }
@@ -102,34 +104,45 @@ func (radio *Radio) TurnOff() {
 }
 
 func (radio *Radio) VolumeUp() {
-	radio.volume++
-	fmt.Println("Increased Radio volume to", radio.volume)
+	if !radio.standby {
+		radio.volume++
+		fmt.Println("Radio volume increased to", radio.volume)
+	}
 }
 
 func (radio *Radio) VolumeDown() {
-	if radio.volume > 0 {
+	if !radio.standby && radio.volume > 0 {
 		radio.volume--
-		fmt.Println("Decreased Radio volume to", radio.volume)
+		fmt.Println("Radio volume decreased to", radio.volume)
 	}
 }
 
 func (radio *Radio) PowerStatus() string {
 	if radio.powerOn {
-		return "The Radio is on"
+		return "on"
 	}
-	return "The Radio is off"
+	return "off"
 }
 
 func (radio *Radio) SetVolume(level int) {
-	radio.volume = level
-	fmt.Println("Set Radio volume to", radio.volume)
+	if !radio.standby {
+		radio.volume = level
+		fmt.Println("Radio volume set to", radio.volume)
+	}
 }
 
 func (radio *Radio) ToggleStandby() {
 	radio.standby = !radio.standby
-	state := "off"
 	if radio.standby {
-		state = "on"
+		fmt.Println("Radio is in standby mode")
+	} else {
+		fmt.Println("Radio is active")
 	}
-	fmt.Println("Radio standby mode is", state)
+}
+
+func (radio *Radio) SetChannel(channel int) {
+	if !radio.standby {
+		radio.channel = channel
+		fmt.Println("Radio channel set to", radio.channel)
+	}
 }
