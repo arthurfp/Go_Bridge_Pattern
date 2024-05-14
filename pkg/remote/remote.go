@@ -2,7 +2,7 @@ package remote
 
 import (
 	"bridge-pattern-go/pkg/device"
-	"fmt"
+	"log"
 )
 
 type Remote interface {
@@ -19,37 +19,38 @@ type BasicRemote struct {
 }
 
 func NewBasicRemote(device device.Device) Remote {
+	log.Println("New Basic Remote created")
 	return &BasicRemote{device: device}
 }
 
 func (r *BasicRemote) On() {
+	log.Println("Turning device on with Basic Remote")
 	r.device.TurnOn()
-	fmt.Println("Device turned on")
 }
 
 func (r *BasicRemote) Off() {
+	log.Println("Turning device off with Basic Remote")
 	r.device.TurnOff()
-	fmt.Println("Device turned off")
 }
 
 func (r *BasicRemote) VolumeUp() {
+	log.Println("Increasing volume with Basic Remote")
 	r.device.VolumeUp()
-	fmt.Println("Volume increased")
 }
 
 func (r *BasicRemote) VolumeDown() {
+	log.Println("Decreasing volume with Basic Remote")
 	r.device.VolumeDown()
-	fmt.Println("Volume decreased")
 }
 
 func (r *BasicRemote) ToggleStandby() {
+	log.Println("Toggling standby mode with Basic Remote")
 	r.device.ToggleStandby()
-	fmt.Println("Standby mode toggled")
 }
 
 func (r *BasicRemote) SetChannel(channel int) {
+	log.Printf("Setting channel to %d with Basic Remote\n", channel)
 	r.device.SetChannel(channel)
-	fmt.Println("Channel set to", channel)
 }
 
 type AdvancedRemote struct {
@@ -58,20 +59,21 @@ type AdvancedRemote struct {
 }
 
 func NewAdvancedRemote(device device.Device) *AdvancedRemote {
+	log.Println("New Advanced Remote created")
 	return &AdvancedRemote{BasicRemote: NewBasicRemote(device).(*BasicRemote)}
 }
 
 func (r *AdvancedRemote) Mute() {
+	log.Println("Muting device with Advanced Remote")
 	r.device.SetVolume(0)
-	fmt.Println("Device muted")
 }
 
 func (r *AdvancedRemote) SetFavoriteChannel(channel int) {
+	log.Printf("Setting favorite channel to %d with Advanced Remote\n", channel)
 	r.favoriteChannel = channel
-	fmt.Println("Favorite channel set to", channel)
 }
 
 func (r *AdvancedRemote) GoToFavoriteChannel() {
+	log.Printf("Going to favorite channel %d with Advanced Remote\n", r.favoriteChannel)
 	r.device.SetChannel(r.favoriteChannel)
-	fmt.Println("Switched to favorite channel", r.favoriteChannel)
 }
