@@ -1,7 +1,8 @@
 package device
 
 import (
-	"log"
+	"errors"
+	"fmt"
 )
 
 type Device interface {
@@ -10,9 +11,9 @@ type Device interface {
 	VolumeUp()
 	VolumeDown()
 	PowerStatus() string
-	SetVolume(level int)
+	SetVolume(level int) error
 	ToggleStandby()
-	SetChannel(channel int)
+	SetChannel(channel int) error
 }
 
 type TV struct {
@@ -23,66 +24,74 @@ type TV struct {
 }
 
 func NewTV() Device {
-	log.Println("Initializing new TV")
 	return &TV{}
 }
 
 func (tv *TV) TurnOn() {
 	if !tv.standby {
 		tv.powerOn = true
-		log.Println("TV turned on")
+		fmt.Println("TV is now on")
 	}
 }
 
 func (tv *TV) TurnOff() {
 	tv.powerOn = false
-	log.Println("TV turned off")
+	fmt.Println("TV is now off")
 }
 
 func (tv *TV) VolumeUp() {
-	if !tv.standby {
+	if !tv.standby && tv.volume < 100 {
 		tv.volume++
-		log.Printf("TV volume increased to %d\n", tv.volume)
+		fmt.Println("TV volume increased to", tv.volume)
 	}
 }
 
 func (tv *TV) VolumeDown() {
 	if !tv.standby && tv.volume > 0 {
 		tv.volume--
-		log.Printf("TV volume decreased to %d\n", tv.volume)
+		fmt.Println("TV volume decreased to", tv.volume)
 	}
 }
 
 func (tv *TV) PowerStatus() string {
-	status := "off"
 	if tv.powerOn {
-		status = "on"
+		return "on"
 	}
-	log.Printf("TV power status: %s\n", status)
-	return status
+	return "off"
 }
 
-func (tv *TV) SetVolume(level int) {
-	if !tv.standby {
-		tv.volume = level
-		log.Printf("TV volume set to %d\n", level)
+func (tv *TV) SetVolume(level int) error {
+	if tv.standby {
+		return errors.New("cannot change volume while in standby mode")
 	}
+	if level < 0 || level > 100 {
+		return errors.New("volume must be between 0 and 100")
+	}
+	tv.volume = level
+	fmt.Println("TV volume set to", tv.volume)
+	return nil
 }
 
 func (tv *TV) ToggleStandby() {
 	tv.standby = !tv.standby
-	state := "active"
+
 	if tv.standby {
-		state = "standby"
+		fmt.Println("TV switched to standby mode")
+	} else {
+		fmt.Println("TV switched to active mode")
 	}
-	log.Printf("TV switched to %s mode\n", state)
 }
 
-func (tv *TV) SetChannel(channel int) {
-	if !tv.standby {
-		tv.channel = channel
-		log.Printf("TV channel set to %d\n", channel)
+func (tv *TV) SetChannel(channel int) error {
+	if tv.standby {
+		return errors.New("cannot change channel while in standby mode")
 	}
+	if channel < 1 || channel > 999 {
+		return errors.New("channel must be between 1 and 999")
+	}
+	tv.channel = channel
+	fmt.Println("TV channel set to", tv.channel)
+	return nil
 }
 
 type Radio struct {
@@ -93,64 +102,72 @@ type Radio struct {
 }
 
 func NewRadio() Device {
-	log.Println("Initializing new Radio")
 	return &Radio{}
 }
 
 func (radio *Radio) TurnOn() {
 	if !radio.standby {
 		radio.powerOn = true
-		log.Println("Radio turned on")
+		fmt.Println("Radio is now on")
 	}
 }
 
 func (radio *Radio) TurnOff() {
 	radio.powerOn = false
-	log.Println("Radio turned off")
+	fmt.Println("Radio is now off")
 }
 
 func (radio *Radio) VolumeUp() {
-	if !radio.standby {
+	if !radio.standby && radio.volume < 100 {
 		radio.volume++
-		log.Printf("Radio volume increased to %d\n", radio.volume)
+		fmt.Println("Radio volume increased to", radio.volume)
 	}
 }
 
 func (radio *Radio) VolumeDown() {
 	if !radio.standby && radio.volume > 0 {
 		radio.volume--
-		log.Printf("Radio volume decreased to %d\n", radio.volume)
+		fmt.Println("Radio volume decreased to", radio.volume)
 	}
 }
 
 func (radio *Radio) PowerStatus() string {
-	status := "off"
 	if radio.powerOn {
-		status = "on"
+		return "on"
 	}
-	log.Printf("Radio power status: %s\n", status)
-	return status
+	return "off"
 }
 
-func (radio *Radio) SetVolume(level int) {
-	if !radio.standby {
-		radio.volume = level
-		log.Printf("Radio volume set to %d\n", level)
+func (radio *Radio) SetVolume(level int) error {
+	if radio.standby {
+		return errors.New("cannot change volume while in standby mode")
 	}
+	if level < 0 || level > 100 {
+		return errors.New("volume must be between 0 and 100")
+	}
+	radio.volume = level
+	fmt.Println("Radio volume set to", radio.volume)
+	return nil
 }
 
 func (radio *Radio) ToggleStandby() {
 	radio.standby = !radio.standby
-	state := "active"
+
 	if radio.standby {
-		state = "standby"
+		fmt.Println("Radio switched to standby mode")
+	} else {
+		fmt.Println("Radio switched to active mode")
 	}
-	log.Printf("Radio switched to %s mode\n", state)
 }
 
-func (radio *Radio) SetChannel(channel int) {
-	if !radio.standby {
-		radio.channel = channel
-		log.Printf("Radio channel set to %d\n", channel)
+func (radio *Radio) SetChannel(channel int) error {
+	if radio.standby {
+		return errors.New("cannot change channel while in standby mode")
 	}
+	if channel < 1 || channel > 999 {
+		return errors.New("channel must be between 1 and 999")
+	}
+	radio.channel = channel
+	fmt.Println("Radio channel set to", radio.channel)
+	return nil
 }
