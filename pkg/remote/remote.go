@@ -11,7 +11,8 @@ type Remote interface {
 	VolumeUp()
 	VolumeDown()
 	ToggleStandby()
-	SetChannel(channel int)
+	SetChannel(channel int, user string)
+	SetVolume(level int, user string)
 }
 
 type BasicRemote struct {
@@ -48,9 +49,16 @@ func (r *BasicRemote) ToggleStandby() {
 	r.device.ToggleStandby()
 }
 
-func (r *BasicRemote) SetChannel(channel int) {
-	log.Printf("Setting channel to %d with Basic Remote\n", channel)
-	r.device.SetChannel(channel)
+func (r *BasicRemote) SetChannel(channel int, user string) {
+	if err := r.device.SetChannel(channel, user); err != nil {
+		log.Println("Error setting channel:", err)
+	}
+}
+
+func (r *BasicRemote) SetVolume(level int, user string) {
+	if err := r.device.SetVolume(level, user); err != nil {
+		log.Println("Error setting volume:", err)
+	}
 }
 
 type AdvancedRemote struct {
@@ -65,7 +73,9 @@ func NewAdvancedRemote(device device.Device) *AdvancedRemote {
 
 func (r *AdvancedRemote) Mute() {
 	log.Println("Muting device with Advanced Remote")
-	r.device.SetVolume(0)
+	if err := r.device.SetVolume(0, "default"); err != nil {
+		log.Println("Error muting volume:", err)
+	}
 }
 
 func (r *AdvancedRemote) SetFavoriteChannel(channel int) {
@@ -75,5 +85,7 @@ func (r *AdvancedRemote) SetFavoriteChannel(channel int) {
 
 func (r *AdvancedRemote) GoToFavoriteChannel() {
 	log.Printf("Going to favorite channel %d with Advanced Remote\n", r.favoriteChannel)
-	r.device.SetChannel(r.favoriteChannel)
+	if err := r.device.SetChannel(r.favoriteChannel, "default"); err != nil {
+		log.Println("Error setting favorite channel:", err)
+	}
 }

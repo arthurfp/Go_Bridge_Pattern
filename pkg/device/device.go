@@ -11,20 +11,35 @@ type Device interface {
 	VolumeUp()
 	VolumeDown()
 	PowerStatus() string
-	SetVolume(level int) error
+	SetVolume(level int, user string) error
 	ToggleStandby()
-	SetChannel(channel int) error
+	SetChannel(channel int, user string) error
+}
+
+type UserProfile struct {
+	Name    string
+	Volume  int
+	Channel int
 }
 
 type TV struct {
-	powerOn bool
-	volume  int
-	standby bool
-	channel int
+	powerOn  bool
+	volume   int
+	standby  bool
+	channel  int
+	profiles map[string]UserProfile
 }
 
 func NewTV() Device {
-	return &TV{}
+	return &TV{profiles: make(map[string]UserProfile)}
+}
+
+func (tv *TV) applyUserProfile(user string) {
+	if profile, exists := tv.profiles[user]; exists {
+		tv.volume = profile.Volume
+		tv.channel = profile.Channel
+		fmt.Printf("Applied profile for %s: Volume %d, Channel %d\n", user, tv.volume, tv.channel)
+	}
 }
 
 func (tv *TV) TurnOn() {
@@ -60,7 +75,7 @@ func (tv *TV) PowerStatus() string {
 	return "off"
 }
 
-func (tv *TV) SetVolume(level int) error {
+func (tv *TV) SetVolume(level int, user string) error {
 	if tv.standby {
 		return errors.New("cannot change volume while in standby mode")
 	}
@@ -68,13 +83,13 @@ func (tv *TV) SetVolume(level int) error {
 		return errors.New("volume must be between 0 and 100")
 	}
 	tv.volume = level
-	fmt.Println("TV volume set to", tv.volume)
+	tv.profiles[user] = UserProfile{Name: user, Volume: level, Channel: tv.channel}
+	fmt.Printf("TV volume set to %d for user %s\n", level, user)
 	return nil
 }
 
 func (tv *TV) ToggleStandby() {
 	tv.standby = !tv.standby
-
 	if tv.standby {
 		fmt.Println("TV switched to standby mode")
 	} else {
@@ -82,7 +97,7 @@ func (tv *TV) ToggleStandby() {
 	}
 }
 
-func (tv *TV) SetChannel(channel int) error {
+func (tv *TV) SetChannel(channel int, user string) error {
 	if tv.standby {
 		return errors.New("cannot change channel while in standby mode")
 	}
@@ -90,19 +105,29 @@ func (tv *TV) SetChannel(channel int) error {
 		return errors.New("channel must be between 1 and 999")
 	}
 	tv.channel = channel
-	fmt.Println("TV channel set to", tv.channel)
+	tv.profiles[user] = UserProfile{Name: user, Volume: tv.volume, Channel: channel}
+	fmt.Printf("TV channel set to %d for user %s\n", channel, user)
 	return nil
 }
 
 type Radio struct {
-	powerOn bool
-	volume  int
-	standby bool
-	channel int
+	powerOn  bool
+	volume   int
+	standby  bool
+	channel  int
+	profiles map[string]UserProfile
 }
 
 func NewRadio() Device {
-	return &Radio{}
+	return &Radio{profiles: make(map[string]UserProfile)}
+}
+
+func (radio *Radio) applyUserProfile(user string) {
+	if profile, exists := radio.profiles[user]; exists {
+		radio.volume = profile.Volume
+		radio.channel = profile.Channel
+		fmt.Printf("Applied profile for %s: Volume %d, Channel %d\n", user, radio.volume, radio.channel)
+	}
 }
 
 func (radio *Radio) TurnOn() {
@@ -138,7 +163,7 @@ func (radio *Radio) PowerStatus() string {
 	return "off"
 }
 
-func (radio *Radio) SetVolume(level int) error {
+func (radio *Radio) SetVolume(level int, user string) error {
 	if radio.standby {
 		return errors.New("cannot change volume while in standby mode")
 	}
@@ -146,13 +171,13 @@ func (radio *Radio) SetVolume(level int) error {
 		return errors.New("volume must be between 0 and 100")
 	}
 	radio.volume = level
-	fmt.Println("Radio volume set to", radio.volume)
+	radio.profiles[user] = UserProfile{Name: user, Volume: level, Channel: radio.channel}
+	fmt.Printf("Radio volume set to %d for user %s\n", level, user)
 	return nil
 }
 
 func (radio *Radio) ToggleStandby() {
 	radio.standby = !radio.standby
-
 	if radio.standby {
 		fmt.Println("Radio switched to standby mode")
 	} else {
@@ -160,7 +185,7 @@ func (radio *Radio) ToggleStandby() {
 	}
 }
 
-func (radio *Radio) SetChannel(channel int) error {
+func (radio *Radio) SetChannel(channel int, user string) error {
 	if radio.standby {
 		return errors.New("cannot change channel while in standby mode")
 	}
@@ -168,6 +193,7 @@ func (radio *Radio) SetChannel(channel int) error {
 		return errors.New("channel must be between 1 and 999")
 	}
 	radio.channel = channel
-	fmt.Println("Radio channel set to", radio.channel)
+	radio.profiles[user] = UserProfile{Name: user, Volume: radio.volume, Channel: channel}
+	fmt.Printf("Radio channel set to %d for user %s\n", channel, user)
 	return nil
 }
