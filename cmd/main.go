@@ -3,6 +3,7 @@ package main
 import (
 	"bridge-pattern-go/pkg/device"
 	"bridge-pattern-go/pkg/remote"
+	"bridge-pattern-go/pkg/user"
 	"bufio"
 	"fmt"
 	"os"
@@ -11,67 +12,74 @@ import (
 )
 
 func main() {
-	fmt.Println("Starting Bridge Pattern Demo")
-
 	tv := device.NewTV()
 	radio := device.NewRadio()
 
 	basicRemote := remote.NewBasicRemote(tv)
 	advancedRemote := remote.NewAdvancedRemote(radio)
 
+	userManager := user.NewUserManager()
+	// Example users
+	userManager.AddUser("John")
+	userManager.AddUser("Jane")
+
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
-		fmt.Println("\nChoose an action:")
-		fmt.Println("1. Turn TV On")
-		fmt.Println("2. Turn TV Off")
-		fmt.Println("3. Turn Radio On")
-		fmt.Println("4. Turn Radio Off")
-		fmt.Println("5. Set TV Channel")
-		fmt.Println("6. Set Radio Favorite Channel")
-		fmt.Println("7. Go to Radio Favorite Channel")
-		fmt.Println("8. Exit")
-
+		fmt.Println("\nEnter command (on, off, volume, channel, profile, exit):")
 		if !scanner.Scan() {
 			break
 		}
-		action := scanner.Text()
+		input := scanner.Text()
+		args := strings.Split(input, " ")
+		command := args[0]
 
-		switch action {
-		case "1":
+		switch command {
+		case "on":
 			basicRemote.On()
-		case "2":
+		case "off":
 			basicRemote.Off()
-		case "3":
-			advancedRemote.On()
-		case "4":
-			advancedRemote.Off()
-		case "5":
-			fmt.Print("Enter channel number for TV: ")
-			if scanner.Scan() {
-				channel, err := strconv.Atoi(strings.TrimSpace(scanner.Text()))
-				if err == nil {
-					basicRemote.SetChannel(channel)
-				} else {
-					fmt.Println("Invalid channel number")
+		case "volume":
+			if len(args) < 3 {
+				fmt.Println("Usage: volume up/down user")
+				continue
+			}
+			volCommand := args[1]
+			targetUser := args[2]
+			if profile, exists := userManager.GetUser(targetUser); exists {
+				if volCommand == "up" {
+					advancedRemote.SetVolume(profile.Volume+1, targetUser)
+				} else if volCommand == "down" {
+					advancedRemote.SetVolume(profile.Volume-1, targetUser)
 				}
 			}
-		case "6":
-			fmt.Print("Enter favorite channel for Radio: ")
-			if scanner.Scan() {
-				channel, err := strconv.Atoi(strings.TrimSpace(scanner.Text()))
-				if err == nil {
-					advancedRemote.SetFavoriteChannel(channel)
-				} else {
-					fmt.Println("Invalid channel number")
-				}
+		case "channel":
+			if len(args) < 3 {
+				fmt.Println("Usage: channel <number> <user>")
+				continue
 			}
-		case "7":
-			advancedRemote.GoToFavoriteChannel()
-		case "8":
+			channel, err := strconv.Atoi(args[1])
+			if err != nil {
+				fmt.Println("Invalid channel number:", args[1])
+				continue
+			}
+			targetUser := args[2]
+			advancedRemote.SetChannel(channel, targetUser)
+		case "profile":
+			if len(args) < 2 {
+				fmt.Println("Usage: profile <user>")
+				continue
+			}
+			targetUser := args[1]
+			if profile, exists := userManager.GetUser(targetUser); exists {
+				fmt.Printf("User: %s, Volume: %d, Channel: %d\n", profile.Name, profile.Volume, profile.Channel)
+			} else {
+				fmt.Println("User profile not found:", targetUser)
+			}
+		case "exit":
 			fmt.Println("Exiting...")
 			return
 		default:
-			fmt.Println("Invalid action")
+			fmt.Println("Unknown command:", command)
 		}
 	}
 }

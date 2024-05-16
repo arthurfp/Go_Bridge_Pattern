@@ -10,14 +10,14 @@ func TestBasicRemote(t *testing.T) {
 	remote := NewBasicRemote(tv)
 
 	remote.On()
-	if status := tv.PowerStatus(); status != "The TV is on" {
+	if status := tv.PowerStatus(); status != "on" {
 		t.Errorf("Expected TV to be on, got %s", status)
 	}
 
 	remote.VolumeUp()
 	remote.ToggleStandby()
 	remote.Off()
-	if status := tv.PowerStatus(); status != "The TV is off" {
+	if status := tv.PowerStatus(); status != "off" {
 		t.Errorf("Expected TV to be off, got %s", status)
 	}
 }
@@ -28,13 +28,13 @@ func TestAdvancedRemote(t *testing.T) {
 
 	remote.On()
 	remote.Mute()
-	if status := radio.PowerStatus(); status != "The Radio is on" {
+	if status := radio.PowerStatus(); status != "on" {
 		t.Errorf("Expected Radio to be on, got %s", status)
 	}
 
 	remote.VolumeDown() // Should remain muted (volume at 0)
 	remote.Off()
-	if status := radio.PowerStatus(); status != "The Radio is off" {
+	if status := radio.PowerStatus(); status != "off" {
 		t.Errorf("Expected Radio to be off, got %s", status)
 	}
 }
