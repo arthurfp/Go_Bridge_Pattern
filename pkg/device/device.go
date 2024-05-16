@@ -14,6 +14,7 @@ type Device interface {
 	SetVolume(level int, user string) error
 	ToggleStandby()
 	SetChannel(channel int, user string) error
+	ResetProfiles()
 }
 
 type UserProfile struct {
@@ -32,14 +33,6 @@ type TV struct {
 
 func NewTV() Device {
 	return &TV{profiles: make(map[string]UserProfile)}
-}
-
-func (tv *TV) applyUserProfile(user string) {
-	if profile, exists := tv.profiles[user]; exists {
-		tv.volume = profile.Volume
-		tv.channel = profile.Channel
-		fmt.Printf("Applied profile for %s: Volume %d, Channel %d\n", user, tv.volume, tv.channel)
-	}
 }
 
 func (tv *TV) TurnOn() {
@@ -110,6 +103,11 @@ func (tv *TV) SetChannel(channel int, user string) error {
 	return nil
 }
 
+func (tv *TV) ResetProfiles() {
+	tv.profiles = make(map[string]UserProfile)
+	fmt.Println("All TV user profiles have been reset.")
+}
+
 type Radio struct {
 	powerOn  bool
 	volume   int
@@ -120,14 +118,6 @@ type Radio struct {
 
 func NewRadio() Device {
 	return &Radio{profiles: make(map[string]UserProfile)}
-}
-
-func (radio *Radio) applyUserProfile(user string) {
-	if profile, exists := radio.profiles[user]; exists {
-		radio.volume = profile.Volume
-		radio.channel = profile.Channel
-		fmt.Printf("Applied profile for %s: Volume %d, Channel %d\n", user, radio.volume, radio.channel)
-	}
 }
 
 func (radio *Radio) TurnOn() {
@@ -196,4 +186,9 @@ func (radio *Radio) SetChannel(channel int, user string) error {
 	radio.profiles[user] = UserProfile{Name: user, Volume: radio.volume, Channel: channel}
 	fmt.Printf("Radio channel set to %d for user %s\n", channel, user)
 	return nil
+}
+
+func (radio *Radio) ResetProfiles() {
+	radio.profiles = make(map[string]UserProfile)
+	fmt.Println("All Radio user profiles have been reset.")
 }
